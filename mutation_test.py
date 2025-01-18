@@ -1,6 +1,7 @@
 import unittest
-import sys
-from original_code import *
+from logging import exception
+
+from mutant import *
 
 class TestAnimalBehavior(unittest.TestCase):
     def setUp(self):
@@ -10,8 +11,10 @@ class TestAnimalBehavior(unittest.TestCase):
 
     # Test for Encapsulation (AMC)
     def test_private_attribute(self):
-        with self.assertRaises(AttributeError):
-            _ = self.animal._age_private  # Should fail if encapsulation is mutated
+        try:
+            _ =  self.animal._age # Should fail if encapsulation is mutated
+        except:
+            raise AttributeError(Exception("mutated by AMC"))
 
     # Test for Inheritance Mutants
     def test_inheritance_hiding_method(self):
@@ -44,8 +47,10 @@ class TestAnimalBehavior(unittest.TestCase):
         self.assertEqual(new_dog.get_info(), "Max is a Bulldog and 4 years old.")  # Ensure constructor works correctly
 
     def test_constructor_deletion(self):
-        with self.assertRaises(TypeError):
+        try:
             _ = Dog()  # Should fail if constructor is deleted
+        except:
+            raise TypeError(Exception("mutated by PCD"))
 
     def test_overriding_method_deletion(self):
         self.assertEqual(self.dog.make_sound(), "Bark!")  # Ensure overridden method exists
@@ -58,6 +63,5 @@ if __name__ == "__main__":
     package = "os"
     class1 = "Animal"
     class2 = "Dog"
-
-    imported = getattr(__import__(package , fromlist=[name]), name)
     unittest.main()
+    print("yess")

@@ -1,6 +1,8 @@
 import ast
-import astor  # Install with `pip install astor`
+import astor
 import os
+from consolemenu import *
+from consolemenu.items import *
 
 
 # Mutation Transformer Class
@@ -22,15 +24,6 @@ class MutationTransformer(ast.NodeTransformer):
             if node.name == "make_sound":
                 # Change the method signature
                 node.args.args.append(ast.arg(arg="loud", annotation=None))
-                # node.body = [
-                #     ast.Return(
-                #         value=ast.IfExp(
-                #             test=ast.Name(id="loud", ctx=ast.Load()),
-                #             body=ast.Str(s="Loud Bark!"),
-                #             orelse=ast.Str(s="Bark!"),
-                #         )
-                #     )
-                # ]
                 node.body = [
                     ast.Return(
                         value=ast.IfExp(
@@ -43,17 +36,6 @@ class MutationTransformer(ast.NodeTransformer):
 
         elif self.mutation_type == "ISI":  # Insert Super Invocation
             if node.name == "make_sound":
-                # super_call = ast.Expr(
-                #     value=ast.Call(
-                #         func=ast.Attribute(
-                #             value=ast.Call(func=ast.Name(id="super", ctx=ast.Load()), args=[], keywords=[]),
-                #             attr="make_sound",
-                #             ctx=ast.Load(),
-                #         ),
-                #         args=[],
-                #         keywords=[],
-                #     )
-                # )
                 super_call = ast.Expr(
                     value=ast.Call(
                         func=ast.Attribute(
@@ -206,7 +188,7 @@ def apply_mutation(source_code, mutation_type):
 
 
 # Mutation Testing Script
-def mutate_file(input_file, output_dir, mutations):
+def mutate_file(input_file, output_file, mutations):
     # Read the source code from the input file
     with open(input_file, "r") as f:
         source_code = f.read()
@@ -214,10 +196,10 @@ def mutate_file(input_file, output_dir, mutations):
     # Apply each mutation and save the result
     for mutation in mutations:
         mutated_code = apply_mutation(source_code, mutation)
-        output_file = os.path.join(output_dir, f"mutated_{mutation}.py")
         with open(output_file, "w") as f:
             f.write(mutated_code)
         print(f"Mutation '{mutation}' applied and saved to: {output_file}")
+
 
 
 # Example Usage
@@ -225,14 +207,34 @@ if __name__ == "__main__":
     # Path to the original source file
     input_file = "original_code.py"  # Replace with your file
     # Directory to save mutated files
-    output_dir = "mutants"
-    os.makedirs(output_dir, exist_ok=True)
+    output_file = "mutant.py"
+    os.makedirs("mutants", exist_ok=True)
 
     # List of mutations to apply
     mutations = ["AMC", "IHI", "IHD", "IOD", "ISI", "IPC", "PMD", "PPD", "PCI", "PCD", "OMD", "OAC"]
 
     # Perform the mutation testing
-    mutate_file(input_file, output_dir, mutations)
+    selected_mutations = []
 
 
-#
+    def handle_selection(selected_item):
+        selected_mutations.append(selected_item)
+        menu.subtitle = f"{selected_item} is selected!"
+        if(len(selected_mutations) <= 1):
+            mutate_file(input_file , output_file , selected_mutations)
+        else:
+            mutate_file(output_file , output_file , selected_mutations)
+
+
+    # Create the menuoutput_dir
+    menu = ConsoleMenu("Mutation", "Choose mutations")
+
+    items = ["AMC", "IHI", "IHD", "IOD", "ISI", "IPC", "PMD", "PPD", "PCI", "PCD", "OMD", "OAC"]
+
+    for item in items:
+        function_item = FunctionItem(f"Select {item}", handle_selection, [item])
+        menu.append_item(function_item)
+
+    # Finally, we call show to show the menu and allow the user to interact
+    menu.show()
+
