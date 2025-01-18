@@ -71,21 +71,7 @@ class MutationTransformer(ast.NodeTransformer):
             if node.name == "get_info":
                 # Add a new argument to the method
                 node.args.args.append(ast.arg(arg="detailed", annotation=None))
-                # node.body = [
-                #     ast.If(
-                #         test=ast.Name(id="detailed", ctx=ast.Load()),
-                #         body=[
-                #             ast.Return(
-                #                 value=ast.Str(s="Detailed information provided.")
-                #             )
-                #         ],
-                #         orelse=[
-                #             ast.Return(
-                #                 value=ast.Str(s="Basic information provided.")
-                #             )
-                #         ],
-                #     )
-                # ]
+
                 node.body = [
                     ast.If(
                         test=ast.Name(id="detailed", ctx=ast.Load()),
@@ -109,16 +95,6 @@ class MutationTransformer(ast.NodeTransformer):
         # Handle class-related mutations
         if self.mutation_type == "IHI":  # Hiding a Method in Subclass
             if node.name == "Dog":
-                # new_method = ast.FunctionDef(
-                #     name="get_info",
-                #     args=ast.arguments(
-                #         posonlyargs=[], args=[ast.arg(arg="self", annotation=None)], vararg=None, kwarg=None, kwonlyargs=[], kw_defaults=[], defaults=[]
-                #     ),
-                #     body=[
-                #         ast.Return(value=ast.Str(s="Hidden method in Dog")),
-                #     ],
-                #     decorator_list=[],
-                # )
                 new_method = ast.FunctionDef(
                     name="get_info",
                     args=ast.arguments(
@@ -275,7 +251,6 @@ if __name__ == "__main__":
             mutate_file(output_file , output_file , selected_mutations)
 
 
-    # Create the menuoutput_dir
     menu = ConsoleMenu("Mutation", "Choose mutations")
 
     items = ["AMC", "IHI", "IHD", "IOD", "ISI", "IPC", "PMD", "PPD", "PCI", "PCD", "OMD", "OAC"]
