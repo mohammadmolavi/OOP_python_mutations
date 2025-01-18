@@ -1,5 +1,4 @@
 import unittest
-from logging import exception
 
 from mutant import *
 

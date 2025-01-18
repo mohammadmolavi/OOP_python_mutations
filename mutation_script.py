@@ -3,6 +3,24 @@ import astor
 import os
 from consolemenu import *
 from consolemenu.items import *
+from mutation_test import TestAnimalBehavior
+
+
+mutation_test_map = {
+        "AMC": "test_private_attribute",
+        "IHI": "test_inheritance_hiding_method",
+        "IHD": "test_inheritance_hiding_field",
+        "IOD": "test_inheritance_overridden_method",
+        "ISI": "test_insert_super_invocation",
+        "IPC": "test_change_parent_class",
+        "PMD": "test_method_deletion",
+        "PPD": "test_parameter_deletion",
+        "PCI": "test_constructor_inlining",
+        "PCD": "test_constructor_deletion",
+        "OMD": "test_overriding_method_deletion",
+        "OAC": "test_argument_change",
+    }
+
 
 
 # Mutation Transformer Class
@@ -118,7 +136,7 @@ class MutationTransformer(ast.NodeTransformer):
                 node.body.append(new_method)
 
         elif self.mutation_type == "IHD":  # Hiding a Field in Subclass
-            if node.name == "Dog":
+            if node.name == "Animal":
                 new_field = ast.Assign(
                     targets=[
                         ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="name", ctx=ast.Store())
@@ -201,6 +219,37 @@ def mutate_file(input_file, output_file, mutations):
         print(f"Mutation '{mutation}' applied and saved to: {output_file}")
 
 
+def run_tests_for_mutations():
+    global survived_count, killed_count
+    survived_count = 0
+    killed_count = 0
+    for mutation in selected_mutations:
+        test_name = mutation_test_map[mutation]
+        print(f"Running test for mutation: {mutation}")
+        test_case = TestAnimalBehavior()
+        try:
+            setup_method = getattr(test_case, "setUp")
+            setup_method()
+            test_method = getattr(test_case, test_name)  # Get the test method by name
+            test_method()  # Call the test method
+            print(f"Test '{test_name}' passed!")
+            survived_count += 1
+        except Exception as e:
+            print(f"Test '{test_name}' failed! Error: {e}")
+            killed_count += 1
+
+def print_mutation_score():
+    # Dictionary of mutations and corresponding test names
+    run_tests_for_mutations()
+    print(f"killed mutations: {killed_count}")
+    print(f"survived mutations: {survived_count}")
+    mutation_score = killed_count / (survived_count + killed_count) * 100
+    print(f"\nFinal Mutation Score: {mutation_score:.2f}%")
+
+
+
+
+
 
 # Example Usage
 if __name__ == "__main__":
@@ -238,3 +287,4 @@ if __name__ == "__main__":
     # Finally, we call show to show the menu and allow the user to interact
     menu.show()
 
+    print_mutation_score()

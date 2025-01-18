@@ -1,7 +1,7 @@
 
 # Original classes
 class Animal:
-    def __init__(self, name, age):
+    def __init__(self, name = 'Animal', age = 0):
         self.name = name
         self._age = age
 
@@ -12,7 +12,7 @@ class Animal:
         return f"{self.name} is {self._age} years old."
 
 class Dog(Animal):
-    def __init__(self, name, age, breed):
+    def __init__(self, name , age , breed):
         super().__init__(name, age)
         self.breed = breed
 

@@ -1,6 +1,6 @@
 class Animal:
 
-    def __init__(self, name, age):
+    def __init__(self, name='Animal', age=0):
         self.name = name
         self.age = age
 
@@ -22,3 +22,6 @@ class Dog(Animal):
 
     def get_info(self):
         return f'{self.name} is a {self.breed} and {self.age} years old.'
+
+    def get_info(self):
+        return 'Hidden method in Dog'
